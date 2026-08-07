@@ -1,0 +1,36 @@
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+
+
+
+const app = express();
+
+// Security
+app.use(helmet());
+
+// CORS
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
+
+// Middleware
+app.use(express.json());
+
+app.use(morgan("dev"));
+
+
+
+// Health Check
+app.get("/", (_req, res) => {
+  res.json({
+    success: true,
+    message: "AI StudyHub API is running 🚀",
+  });
+});
+
+export default app;
