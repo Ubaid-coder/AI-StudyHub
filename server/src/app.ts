@@ -4,6 +4,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 
 import chatRoutes from "./routes/chat.routes";
+import { errorMiddleware } from "./middlewares/error.middlewar";
 
 const app = express();
 
@@ -32,5 +33,8 @@ app.get("/", (_req, res) => {
     message: "AI StudyHub API is running 🚀",
   });
 });
+
+// Must be LAST
+app.use(errorMiddleware);
 
 export default app;
