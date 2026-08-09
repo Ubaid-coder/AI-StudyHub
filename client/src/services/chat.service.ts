@@ -1,4 +1,4 @@
-// client/src/services/chat.service.ts
+import { api } from '@/lib/api';
 import axios from 'axios';
 
 interface BackendChatResponse {
@@ -6,17 +6,6 @@ interface BackendChatResponse {
     reply: string;
   };
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-
-// Create an Axios instance with base configuration
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 
 
 export const chatService = {
