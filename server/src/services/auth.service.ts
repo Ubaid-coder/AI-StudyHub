@@ -1,6 +1,10 @@
 import bcrypt from 'bcryptjs';
 import { User } from "../models/user.model";
-import type { RegisterInput } from '../validators/auth.validator';
+import type { LoginInput, RegisterInput } from '../validators/auth.validator';
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/jwt";
 
 export const registerUser = async (
     input: RegisterInput
@@ -32,3 +36,47 @@ export const registerUser = async (
         createdAt: user.createdAt,
     }
 }
+
+export const loginUser = async (
+  input: LoginInput
+) => {
+  const { email, password } = input;
+
+  // 1. Find user
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new Error("Invalid email or password.");
+  }
+
+  // 2. Compare password
+  const passwordMatches = await bcrypt.compare(
+    password,
+    user.password
+  );
+
+  if (!passwordMatches) {
+    throw new Error("Invalid email or password.");
+  }
+
+  // 3. Generate tokens
+  const accessToken = generateAccessToken(
+    user._id.toString()
+  );
+
+  const refreshToken = generateRefreshToken(
+    user._id.toString()
+  );
+
+  // 4. Return safe user information
+  return {
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+    },
+    accessToken,
+    refreshToken,
+  };
+};

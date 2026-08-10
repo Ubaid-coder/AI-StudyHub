@@ -2,11 +2,12 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.routes";
 import chatRoutes from "./routes/chat.routes";
 
-import { errorMiddleware } from "./middlewares/error.middlewar";
+import { errorMiddleware } from "./middleware/error.middlewar";
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use(express.json());
 
 app.use(morgan("dev"));
 
+app.use(cookieParser());
 
 
 // Health Check
