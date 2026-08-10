@@ -1,11 +1,13 @@
 import { env } from "./config/env";
-
+import { connectDatabase } from './config/database';
 import app from "./app";
 
-const PORT = env.PORT || 5000;
+const startServer = async () => {
+  await connectDatabase();
+  const PORT = env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`
+  app.listen(PORT, () => {
+    console.log(`
     ================================
     
     🚀 Server Running
@@ -17,3 +19,6 @@ app.listen(PORT, () => {
     ================================
     `);
   });
+}
+
+startServer();
