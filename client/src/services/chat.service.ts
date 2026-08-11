@@ -1,4 +1,4 @@
-import { api } from '@/lib/api';
+import  api  from '@/lib/api';
 import axios from 'axios';
 
 interface BackendChatResponse {
@@ -12,9 +12,10 @@ export const chatService = {
   async sendMessage(message: string): Promise<BackendChatResponse> { 
     try {
       // 3. Update the Axios post generic type
-      const response = await api.post<BackendChatResponse>('/api/chat', {
+      const response = await api.post<BackendChatResponse>('/chat', {
         message,
       });
+      
       return response.data; 
     } catch (error) {
       if (axios.isAxiosError(error)) {

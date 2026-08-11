@@ -23,7 +23,7 @@ export const protect = async (
 ) => {
   try {
     const authorization = req.headers.authorization;
-
+console.log(authorization)
     if (!authorization) {
       return res.status(401).json({
         success: false,
