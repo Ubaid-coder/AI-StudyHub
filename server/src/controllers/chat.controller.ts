@@ -1,12 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { generateResponse } from "../services/gemini.service";
 import { chatSchema } from '../validators/chat.validator';
-import {
-  AuthenticatedRequest,
-} from "../middleware/auth.middleware";
+
 
 export const chatController = async (
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -21,9 +19,6 @@ export const chatController = async (
       })
     }
     const { message } = result.data;
-console.log(
-      `AI request from user: ${req.user?.email}`
-    );
 
 
     const reply = await generateResponse(message);
