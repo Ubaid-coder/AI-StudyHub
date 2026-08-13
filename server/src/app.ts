@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.routes";
 import chatRoutes from "./routes/chat.routes";
+import pdfRoutes from "./routes/pdf.routes";
 
 import { errorMiddleware } from "./middleware/error.middlewar";
 
@@ -40,6 +41,7 @@ app.get("/", (_req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/pdfs", pdfRoutes);
 
 // Must be LAST
 app.use(errorMiddleware);
