@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-
+import mongoose from "mongoose";
 import Pdf from "../models/pdf.model";
 import { analyzePdf } from "../services/pdf-ai.service";
 
@@ -98,6 +98,99 @@ export const uploadPdfController = async (
     return res.status(500).json({
       success: false,
       message: "Failed to process PDF.",
+    });
+  }
+};
+
+export const getUserPdfsController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated.",
+      });
+    }
+
+    const pdfs = await Pdf.find({
+      user: req.user._id,
+    })
+      .select(
+        "_id originalName size status title difficulty topics createdAt updatedAt"
+      )
+      .sort({
+        createdAt: -1,
+      });
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        pdfs,
+      },
+    });
+  } catch (error) {
+    console.error(
+      "Get User PDFs Controller Error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch PDFs.",
+    });
+  }
+};
+
+export const getPdfByIdController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated.",
+      });
+    }
+
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id as string)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid PDF ID.",
+      });
+    }
+
+    const pdf = await Pdf.findOne({
+      _id: id,
+      user: req.user._id,
+    });
+
+    if (!pdf) {
+      return res.status(404).json({
+        success: false,
+        message: "PDF not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        pdf,
+      },
+    });
+  } catch (error) {
+    console.error(
+      "Get PDF By ID Controller Error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch PDF.",
     });
   }
 };
