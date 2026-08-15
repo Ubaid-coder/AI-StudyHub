@@ -1,4 +1,4 @@
-import api, { setAccessToken } from "@/lib/api";
+import api, { setAccessToken } from "@/lib/axios";
 
 import type {
   RegisterRequest,

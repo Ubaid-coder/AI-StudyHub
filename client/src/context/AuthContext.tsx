@@ -16,6 +16,8 @@ import {
   logoutUser,
 } from "@/services/auth.service";
 
+import { setAccessToken } from "@/lib/axios";
+
 import type {
   AuthContextType,
   LoginRequest,
@@ -35,9 +37,9 @@ export const AuthProvider = ({
   children,
 }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const [accessToken, setAccessTokenState] = useState<string | null>(
-    null
-  );
+
+  const [accessToken, setAccessTokenState] =
+    useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -49,9 +51,10 @@ export const AuthProvider = ({
       try {
         const response = await refreshAccessToken();
 
-        setAccessTokenState(
-          response.data.accessToken
-        );
+        const token = response.data.accessToken;
+
+        setAccessTokenState(token);
+        setAccessToken(token);
 
         const meResponse = await getCurrentUser();
 
@@ -59,6 +62,7 @@ export const AuthProvider = ({
       } catch (error) {
         setUser(null);
         setAccessTokenState(null);
+        setAccessToken(null);
       } finally {
         setIsLoading(false);
       }
@@ -78,9 +82,10 @@ export const AuthProvider = ({
   ) => {
     const response = await loginUser(data);
 
-    setAccessTokenState(
-      response.data.accessToken
-    );
+    const token = response.data.accessToken;
+
+    setAccessTokenState(token);
+    setAccessToken(token);
 
     setUser(response.data.user);
   };
@@ -91,6 +96,7 @@ export const AuthProvider = ({
     } finally {
       setUser(null);
       setAccessTokenState(null);
+      setAccessToken(null);
     }
   };
 
@@ -98,14 +104,16 @@ export const AuthProvider = ({
     try {
       const response = await refreshAccessToken();
 
-      setAccessTokenState(
-        response.data.accessToken
-      );
+      const token = response.data.accessToken;
 
-      return response.data.accessToken;
+      setAccessTokenState(token);
+      setAccessToken(token);
+
+      return token;
     } catch {
       setUser(null);
       setAccessTokenState(null);
+      setAccessToken(null);
 
       return null;
     }
