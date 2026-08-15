@@ -1,19 +1,25 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { generateResponse } from "../services/gemini.service";
+import { chatSchema } from '../validators/chat.validator';
+
 
 export const chatController = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
-    const { message } = req.body;
+    const result = chatSchema.safeParse(req.body);
 
-    if (!message) {
+    if (!result.success) {
       return res.status(400).json({
         success: false,
-        message: "Message is required.",
-      });
+        message: "Invalid request",
+        errors: result.error.flatten()
+      })
     }
+    const { message } = result.data;
+
 
     const reply = await generateResponse(message);
 
@@ -24,11 +30,6 @@ export const chatController = async (
       },
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    console.error("Chat Controller Error:", errorMessage);
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
+    next(error);
   }
 };
