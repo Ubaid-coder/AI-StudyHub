@@ -4,6 +4,7 @@ import {
   uploadPdfController,
   getUserPdfsController,
   getPdfByIdController,
+  askPdfTutorController,
 } from "../controllers/pdf.controller";
 
 import { protect } from "../middleware/auth.middleware";
@@ -24,11 +25,17 @@ router.get(
   protect,
   getUserPdfsController
 );
+router.post(
+  "/:id/ask",
+  protect,
+  askPdfTutorController
+);
 
 router.get(
   "/:id",
   protect,
   getPdfByIdController
 );
+
 
 export default router;

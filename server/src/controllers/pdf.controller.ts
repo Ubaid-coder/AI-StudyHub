@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import Pdf from "../models/pdf.model";
 import { analyzePdf } from "../services/pdf-ai.service";
+import { askPdfTutor } from "../services/pdf-tutor.service";
 
 export const uploadPdfController = async (
   req: Request,
@@ -191,6 +192,92 @@ export const getPdfByIdController = async (
     return res.status(500).json({
       success: false,
       message: "Failed to fetch PDF.",
+    });
+  }
+};
+
+export const askPdfTutorController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated.",
+      });
+    }
+
+    const { id } = req.params;
+
+    const { question } = req.body;
+
+    if (!question || typeof question !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Question is required.",
+      });
+    }
+
+    const trimmedQuestion = question.trim();
+
+    if (!trimmedQuestion) {
+      return res.status(400).json({
+        success: false,
+        message: "Question cannot be empty.",
+      });
+    }
+
+    if (trimmedQuestion.length > 2000) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Question cannot exceed 2000 characters.",
+      });
+    }
+
+    const pdf = await Pdf.findOne({
+      _id: id,
+      user: req.user._id,
+    });
+
+    if (!pdf) {
+      return res.status(404).json({
+        success: false,
+        message: "Study material not found.",
+      });
+    }
+
+    if (pdf.status !== "completed") {
+      return res.status(400).json({
+        success: false,
+        message:
+          "This study material has not finished processing yet.",
+      });
+    }
+
+    const answer = await askPdfTutor({
+      pdf,
+      question: trimmedQuestion,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        question: trimmedQuestion,
+        answer,
+      },
+    });
+  } catch (error) {
+    console.error(
+      "Ask PDF Tutor Controller Error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Failed to generate tutor response.",
     });
   }
 };
